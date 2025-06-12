@@ -1,5 +1,15 @@
 import streamlit as st
+import os
+import subprocess
 
+try:
+    import torch
+except ImportError:
+    subprocess.check_call([
+        "pip", "install", "torch==2.1.2",
+        "--index-url", "https://download.pytorch.org/whl/cpu"
+    ])
+    import torch
 st.set_page_config(
     page_title="NLP App",
     layout="wide"
