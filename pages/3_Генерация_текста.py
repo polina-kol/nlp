@@ -4,25 +4,28 @@ import os
 import textwrap
 import streamlit as st
 
+from transformers import GPT2LMHeadModel
+
 @st.cache_resource
 def load_gpt_model_and_tokenizer(model_path):
     try:
-        # Проверяем наличие файла модели
         model_file = os.path.join(model_path, "gpt.pt")
         if not os.path.exists(model_file):
             st.error(f"Файл модели не найден по пути: {model_file}")
             return None, None
-        
-        # Загружаем токенизатор
+
         tokenizer = AutoTokenizer.from_pretrained("sberbank-ai/rugpt3small_based_on_gpt2")
         
-        # Загружаем всю модель целиком (а не только state_dict)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model = torch.load(model_file, map_location=device)
+
+        # Инициализируем модель той же архитектуры
+        model = GPT2LMHeadModel.from_pretrained("sberbank-ai/rugpt3small_based_on_gpt2")
+        model.load_state_dict(torch.load(model_file, map_location=device))  # ✅ Загружаем state_dict
+        model.to(device)
         model.eval()
-        
+
         return tokenizer, model
-        
+
     except Exception as e:
         st.error(f"Ошибка загрузки модели: {str(e)}")
         return None, None
