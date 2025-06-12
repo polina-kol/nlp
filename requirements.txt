@@ -1,6 +1,6 @@
 -f https://download.pytorch.org/whl/cpu/torch_stable.html
 
-torch==2.0.1+cpu
+torch==2.7.1+cpu
 streamlit==1.45.1
 transformers==4.30.0
 tokenizers==0.13.3
