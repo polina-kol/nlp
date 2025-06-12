@@ -15,12 +15,16 @@ def load_gpt_model_and_tokenizer(model_path):
             return None, None
 
         tokenizer = AutoTokenizer.from_pretrained("sberbank-ai/rugpt3small_based_on_gpt2")
-        
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        # Инициализируем модель той же архитектуры
+        # 1. Создаем модель по архитектуре
         model = GPT2LMHeadModel.from_pretrained("sberbank-ai/rugpt3small_based_on_gpt2")
-        model.load_state_dict(torch.load(model_file, map_location=device))  # ✅ Загружаем state_dict
+
+        # 2. Загружаем веса
+        state_dict = torch.load(model_file, map_location=device)
+        model.load_state_dict(state_dict)
+
+        # 3. Переносим на устройство и ставим в режим eval
         model.to(device)
         model.eval()
 
