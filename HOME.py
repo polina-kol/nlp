@@ -1,19 +1,15 @@
 import streamlit as st
 
-# Установка заголовка приложения
-st.set_page_config(page_title="NLP App", layout="wide")
 
-# Навигация через sidebar
-st.sidebar.title("Навигация")
-page = st.sidebar.radio(
-    "Выберите страницу",
-    ["Главная", "Классификация отзыва на фильм", "Оценка степени токсичности", "Генерация текста GPT"]
+import streamlit as st
+
+st.set_page_config(
+    page_title="NLP App",
+    layout="wide"
 )
 
-# Загрузка нужной страницы
-if page == "Главная":
-    st.title("Добро пожаловать в NLP-приложение!")
-    st.write("""
+st.title("Добро пожаловать!")  # Можно убрать, если не нужно
+st.write("""
     Это многофункциональное приложение для обработки естественного языка, которое включает следующие возможности:
 
     - **Классификация отзыва на фильм:**  
@@ -25,15 +21,3 @@ if page == "Главная":
     - **Генерация текста GPT:**  
       Использует предобученную модель GPT для генерации текста на основе пользовательского входа.
     """)
-
-elif page == "Классификация отзыва на фильм":
-    st.title("Классификация отзыва на фильм")
-    st.info("Страница в разработке.")
-
-elif page == "Оценка степени токсичности":
-    from pages import toxicity_page
-    toxicity_page.show()
-
-elif page == "Генерация текста GPT":
-    from pages import generation_page
-    generation_page.show()
