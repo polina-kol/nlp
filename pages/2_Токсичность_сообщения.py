@@ -1,7 +1,6 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import streamlit as st
-import numpy as np
 import textwrap
 
 @st.cache_resource
@@ -13,14 +12,16 @@ def load_model():
 
 tokenizer, model = load_model()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device).eval()
+model.to(device)
+model.eval()
 
 classes = ['нормальный', 'оскорбления', 'мат', 'угрозы', 'неуместный']
 
 def analyze_text_detailed(text):
     with torch.no_grad():
         inputs = tokenizer(text, return_tensors='pt', truncation=True, padding=True).to(device)
-        proba = torch.sigmoid(model(**inputs).logits).cpu().numpy()
+        logits = model(**inputs).logits
+        proba = torch.sigmoid(logits).cpu().numpy()
 
     if isinstance(text, str):
         proba = proba[0]
@@ -41,8 +42,9 @@ def analyze_text_detailed(text):
 
 def show():
     st.title("Оценка степени токсичности")
+    st.write("Введите текст для проверки:")
 
-    user_input = st.text_area("Введите текст для проверки:", height=200)
+    user_input = st.text_area("", height=200)
 
     if st.button("Проверка"):
         if not user_input.strip():
@@ -58,14 +60,15 @@ def show():
             st.write(f"**Уверенность модели:** {result['confidence'] * 100:.1f}%")
 
             st.write("**Вероятности по категориям:**")
-            probs = result['probabilities']
-            for cls, prob in probs.items():
+            for cls, prob in result['probabilities'].items():
                 st.write(f"- {cls}: {prob * 100:.1f}%")
 
-            # Совет пользователю
             if toxic_percent > 70:
                 st.error("⚠️ Рекомендуется удалить комментарий.")
             elif toxic_percent > 40:
                 st.warning("❗ Рекомендуется модерировать комментарий.")
             else:
                 st.success("✅ Комментарий можно оставить.")
+
+if __name__ == "__main__":
+    show()
